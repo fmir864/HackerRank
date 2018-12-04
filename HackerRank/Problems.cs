@@ -343,66 +343,52 @@ namespace HackerRank
             Console.ReadLine();
         }
 
-        private string Braces(string values)
+        private string Braces(string s)
         {
-            //if (values == null || values.Count().Equals(0))
-            //    return null;
+            if (string.IsNullOrWhiteSpace(s))
+                return "NO";
 
-            int braket = 0;
-            int curlyBracket = 0;
-            int squareBracket = 0;
+            bool invalidState = false;
+            Stack braces = new Stack();
 
-            bool missingBracket = false;
-
-
-            List<char> matched = new List<char>();
-
-            foreach (var c in values)
+            foreach (var c in s)
             {
-                if (c.Equals('('))
-                    braket++;
-                else if (c.Equals(')'))
+                if (braces.Count.Equals(0))
                 {
-                    if (braket > 0)
+                    if (c.Equals(')') || c.Equals('}') || c.Equals(']'))
                     {
-                        braket--;
+                        invalidState = true;
+                        break;
                     }
-                    else
+
+                    if (c.Equals('(') || c.Equals('{') || c.Equals('['))
                     {
-                        missingBracket = false;
+                        braces.Push(c);
+                        continue;
                     }
                 }
-
-                if (c.Equals('{'))
-                    curlyBracket++;
-                else if (c.Equals('}'))
+                else
                 {
-                    if (curlyBracket > 0)
+                    var b = (char)braces.Peek();
+                    if ((b.Equals('(') && c.Equals(')')) || (b.Equals('{') && c.Equals('}')) || (b.Equals('[') && c.Equals(']')))
                     {
-                        curlyBracket--;
+                        braces.Pop();
+                        continue;
                     }
-                    else
+                    if ((b.Equals('(') || b.Equals('{') || b.Equals('[')) && (c.Equals('(') || c.Equals('{') || c.Equals('[')))
                     {
-                        missingBracket = false;
+                        braces.Push(c);
+                        continue;
                     }
-                }
-
-                if (c.Equals('['))
-                    squareBracket++;
-                else if (c.Equals(']'))
-                {
-                    if (squareBracket > 0)
+                    if ((b.Equals('(') || b.Equals('{') || b.Equals('[')) && (c.Equals(')') || c.Equals('}') || c.Equals(']')))
                     {
-                        squareBracket--;
-                    }
-                    else
-                    {
-                        missingBracket = false;
+                        invalidState = true;
+                        break;
                     }
                 }
             }
 
-            return missingBracket || braket > 0 || curlyBracket > 0 || squareBracket > 0 ? "NO" : "YES";
+            return braces.Count > 0 || invalidState ? "NO" : "YES";
         }
 
         public void GetOneBits(int n)
